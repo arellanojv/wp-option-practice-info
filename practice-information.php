@@ -60,7 +60,9 @@ class PracticeInfoSettings
   public function render_text_field($args)
   {
     $option = get_option($args['label_for']);
+    $brick_function = 'get_' . $args['label_for'];
     echo '<input type="text" id="' . esc_attr($args['label_for']) . '" name="' . esc_attr($args['label_for']) . '" value="' . esc_attr($option) . '" />';
+    echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
   }
 
   // Display the settings page content
@@ -125,7 +127,6 @@ class PracticeInfoSettings
 // Initialize the plugin
 new PracticeInfoSettings();
 
-
 // Create global wrapper functions
 function get_practice_name()
 {
@@ -167,7 +168,7 @@ function get_offer_page_link()
   return PracticeInfoSettings::get_offer_page_link();
 }
 
-//Bricks Filter https://academy.bricksbuilder.io/article/filter-bricks-code-echo_function_names/
+// Bricks Filter https://academy.bricksbuilder.io/article/filter-bricks-code-echo_function_names/
 add_filter('bricks/code/echo_function_names', function () {
   return [
     'get_practice_name',
