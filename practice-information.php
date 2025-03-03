@@ -42,6 +42,9 @@ class PracticeInfoSettings
     register_setting('practice_info_group', 'cta_label');
     register_setting('practice_info_group', 'offer_page_link');
 
+    // Register new setting for final contact number option
+    register_setting('practice_info_group', 'final_contact_number_option');
+
     // Add settings section
     add_settings_section('practice_info_section', 'Practice Information', null, 'practice-info-settings');
 
@@ -54,6 +57,27 @@ class PracticeInfoSettings
     add_settings_field('call_tracking_number', 'Call Tracking Number', [$this, 'render_text_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'call_tracking_number']);
     add_settings_field('cta_label', 'CTA Label', [$this, 'render_text_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'cta_label']);
     add_settings_field('offer_page_link', 'Offer Page Link', [$this, 'render_text_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'offer_page_link']);
+
+    // Add new field for contact number selection
+    add_settings_field('final_contact_number_option', 'Final Contact Number', [$this, 'render_contact_selection_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'final_contact_number_option']);
+  }
+
+  public function render_contact_selection_field($args)
+  {
+    $option = get_option($args['label_for'], 'contact_number'); // Default to regular contact number
+?>
+    <select id="<?php echo esc_attr($args['label_for']); ?>" name="<?php echo esc_attr($args['label_for']); ?>">
+      <option value="contact_number" <?php selected($option, 'contact_number'); ?>>Regular Contact Number</option>
+      <option value="call_tracking_number" <?php selected($option, 'call_tracking_number'); ?>>Call Tracking Number</option>
+    </select>
+    <p><em>Bricks: {echo:get_final_contact_number}</em></p>
+  <?php
+  }
+
+  public static function get_final_contact_number()
+  {
+    $selected_option = get_option('final_contact_number_option', 'contact_number'); // Default to regular contact number
+    return get_option($selected_option, '');
   }
 
   // Render text fields
@@ -68,7 +92,7 @@ class PracticeInfoSettings
   // Display the settings page content
   public function settings_page_content()
   {
-?>
+  ?>
     <div class="wrap">
       <h1>Practice Information Settings</h1>
       <form action="options.php" method="POST">
@@ -167,6 +191,10 @@ function get_offer_page_link()
 {
   return PracticeInfoSettings::get_offer_page_link();
 }
+function get_final_contact_number()
+{
+  return PracticeInfoSettings::get_final_contact_number();
+}
 
 // Bricks Filter https://academy.bricksbuilder.io/article/filter-bricks-code-echo_function_names/
 add_filter('bricks/code/echo_function_names', function () {
@@ -179,5 +207,6 @@ add_filter('bricks/code/echo_function_names', function () {
     'get_call_tracking_number',
     'get_cta_label',
     'get_offer_page_link',
+    'get_final_contact_number',
   ];
 });
