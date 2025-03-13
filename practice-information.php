@@ -2,7 +2,7 @@
 /*
 Plugin Name: UCMPGS - Practice Info Settings
 Description: Doctor Practice Information
-Version: 1.0
+Version: 1.2.2
 Author: JVA
 */
 
@@ -65,6 +65,7 @@ class PracticeInfoSettings
 
     // Register new setting for final contact number option
     register_setting('practice_info_group', 'final_contact_number_option');
+    register_setting('practice_info_group', 'final_contact_number_option_2');
 
     // Add settings section for the first location
     add_settings_section('practice_info_section', 'First Location - Practice Information', null, 'practice-info-settings');
@@ -83,6 +84,7 @@ class PracticeInfoSettings
     add_settings_field('google_map_link', 'Google Map Link', [$this, 'render_text_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'google_map_link']);
     add_settings_field('practice_hours', 'Practice Hours', [$this, 'render_wysiwyg_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'practice_hours']);
 
+    add_settings_field('final_contact_number_option', 'Final Contact Number', [$this, 'render_contact_selection_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'final_contact_number_option']);
     // Add settings section for the second location
     add_settings_section('practice_info_section_2', 'Second Location - Practice Information', null, 'practice-info-settings2');
 
@@ -99,11 +101,10 @@ class PracticeInfoSettings
     add_settings_field('cta_label_2', 'CTA Label', [$this, 'render_text_field'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'cta_label_2']);
     add_settings_field('offer_page_link_2', 'Offer Page Link', [$this, 'render_text_field'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'offer_page_link_2']);
     add_settings_field('google_map_link_2', 'Google Map Link', [$this, 'render_text_field'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'google_map_link_2']);
-    add_settings_field('practice_hours_2', 'Practice Hours', [$this, 'render_wysiwyg_field'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'practice_hours_2']);
+    add_settings_field('practice_hours_2', 'Practice Hours', [$this, 'render_wysiwyg_field2'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'practice_hours_2']);
 
     // Add new field for contact number selection
-    add_settings_field('final_contact_number_option', 'Final Contact Number', [$this, 'render_contact_selection_field'], 'practice-info-settings', 'practice_info_section', ['label_for' => 'final_contact_number_option']);
-    add_settings_field('final_contact_number_option', 'Final Contact Number', [$this, 'render_contact_selection_field'], 'practice-info-settings2', 'practice_info_section', ['label_for' => 'final_contact_number_option']);
+    add_settings_field('final_contact_number_option_2', 'Final Contact Number', [$this, 'render_contact_selection_field2'], 'practice-info-settings2', 'practice_info_section_2', ['label_for' => 'final_contact_number_option_2']);
   }
 
   public function render_contact_selection_field($args)
@@ -111,6 +112,7 @@ class PracticeInfoSettings
     $option = get_option($args['label_for'], 'contact_number'); // Default to regular contact number
 ?>
     <select id="<?php echo esc_attr($args['label_for']); ?>" name="<?php echo esc_attr($args['label_for']); ?>">
+      <option value="">Please Select</option>
       <option value="contact_number" <?php selected($option, 'contact_number'); ?>>Regular Contact Number</option>
       <option value="call_tracking_number" <?php selected($option, 'call_tracking_number'); ?>>Call Tracking Number</option>
     </select>
@@ -118,7 +120,35 @@ class PracticeInfoSettings
   <?php
   }
 
+  public function render_contact_selection_field2($args)
+  {
+    $option = get_option($args['label_for'], 'contact_number_2'); // Default to regular contact number
+  ?>
+    <select id="<?php echo esc_attr($args['label_for']); ?>" name="<?php echo esc_attr($args['label_for']); ?>">
+      <option value="">Please Select</option>
+      <option value="contact_number_2" <?php selected($option, 'contact_number_2'); ?>>Regular Contact Number</option>
+      <option value="call_tracking_number_2" <?php selected($option, 'call_tracking_number_2'); ?>>Call Tracking Number</option>
+    </select>
+    <p><em>Bricks: {echo:get_final_contact_number_2}</em></p>
+  <?php
+  }
+
   public function render_wysiwyg_field($args)
+  {
+    $option = get_option($args['label_for'], '');
+    $brick_function = 'get_' . $args['label_for'];
+    wp_editor($option, esc_attr($args['label_for']), [
+      'textarea_name' => esc_attr($args['label_for']),
+      'media_buttons' => true,
+      'teeny'         => false,
+      'quicktags'     => true,
+      'editor_css'    => '<style>.wp-editor-container { max-width: 600px; } </style>',
+      'textarea_rows' => 10,
+    ]);
+    echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
+  }
+
+  public function render_wysiwyg_field2($args)
   {
     $option = get_option($args['label_for'], '');
     $brick_function = 'get_' . $args['label_for'];
@@ -139,6 +169,13 @@ class PracticeInfoSettings
     return get_option($selected_option, '');
   }
 
+  public static function get_final_contact_number_2()
+  {
+    $selected_option = get_option('final_contact_number_option_2', 'contact_number_2'); // Default to regular contact number
+    return get_option($selected_option, '');
+  }
+
+
   // Render text fields
   public function render_text_field($args)
   {
@@ -151,9 +188,11 @@ class PracticeInfoSettings
   public function render_toggle_field($args)
   {
     $option = get_option($args['label_for'], false);
-    echo '<input type="checkbox" id="' . esc_attr($args['label_for']) . '" name="' . esc_attr($args['label_for']) . '" ' . checked($option, true, false) . ' />';
+    echo '<input type="checkbox" id="' . esc_attr($args['label_for']) . '" name="' . esc_attr($args['label_for']) . '" ' . checked($option, 'on', '') . ' />';
     echo '<label for="' . esc_attr($args['label_for']) . '">Enable Second Location</label>';
+    echo $option;
   }
+
 
   public function settings_page_content()
   {
@@ -166,9 +205,16 @@ class PracticeInfoSettings
         do_settings_sections('practice-info-settings');
 
         // Render the second location section only if the toggle is enabled
-        if (get_option('show_second_location', false)) {
-          do_settings_sections('practice-info-settings-2');
-        }
+
+        ?>
+        <div id="practice-info-settings-2">
+          <?php
+          if (get_option('show_second_location', false)) {
+            do_settings_sections('practice-info-settings2');
+          }
+          ?>
+        </div>
+        <?php
 
         submit_button();
         ?>
@@ -364,6 +410,11 @@ function get_google_map_link()
   return PracticeInfoSettings::get_google_map_link();
 }
 
+function get_practice_hours()
+{
+  return PracticeInfoSettings::get_practice_hours();
+}
+
 function get_final_contact_number()
 {
   return PracticeInfoSettings::get_final_contact_number();
@@ -430,6 +481,11 @@ function get_practice_hours_2()
   return PracticeInfoSettings::get_practice_hours_2();
 }
 
+function get_final_contact_number_2()
+{
+  return PracticeInfoSettings::get_final_contact_number_2();
+}
+
 // Bricks Filter https://academy.bricksbuilder.io/article/filter-bricks-code-echo_function_names/
 add_filter('bricks/code/echo_function_names', function () {
   return [
@@ -458,5 +514,6 @@ add_filter('bricks/code/echo_function_names', function () {
     'get_offer_page_link_2',
     'get_google_map_link_2',
     'get_practice_hours_2',
+    'get_final_contact_number_2',
   ];
 });
