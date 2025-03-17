@@ -117,6 +117,7 @@ class PracticeInfoSettings
       <option value="call_tracking_number" <?php selected($option, 'call_tracking_number'); ?>>Call Tracking Number</option>
     </select>
     <p><em>Bricks: {echo:get_final_contact_number}</em></p>
+    <p><em>Oxygen: [oxygen data="phpfunction" function="get_final_contact_number"]</em></p>
   <?php
   }
 
@@ -130,6 +131,7 @@ class PracticeInfoSettings
       <option value="call_tracking_number_2" <?php selected($option, 'call_tracking_number_2'); ?>>Call Tracking Number</option>
     </select>
     <p><em>Bricks: {echo:get_final_contact_number_2}</em></p>
+    <p><em>Oxygen: [oxygen data="phpfunction" function="get_final_contact_number_2"]</em></p>
   <?php
   }
 
@@ -146,6 +148,7 @@ class PracticeInfoSettings
       'textarea_rows' => 10,
     ]);
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
+    echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
   }
 
   public function render_wysiwyg_field2($args)
@@ -161,6 +164,7 @@ class PracticeInfoSettings
       'textarea_rows' => 10,
     ]);
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
+    echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
   }
 
   public static function get_final_contact_number()
@@ -183,6 +187,7 @@ class PracticeInfoSettings
     $brick_function = 'get_' . $args['label_for'];
     echo '<input type="text" id="' . esc_attr($args['label_for']) . '" name="' . esc_attr($args['label_for']) . '" value="' . esc_attr($option) . '" />';
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
+    echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
   }
 
   public function render_toggle_field($args)
