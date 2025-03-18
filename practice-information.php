@@ -2,7 +2,7 @@
 /*
 Plugin Name: UCMPGS - Practice Info Settings
 Description: Doctor Practice Information
-Version: 1.2.2
+Version: 1.2.3
 Author: JVA
 */
 
@@ -16,6 +16,7 @@ class PracticeInfoSettings
     add_action('admin_menu', [$this, 'create_settings_page']);
     add_action('admin_init', [$this, 'setup_settings']);
     add_action('admin_enqueue_scripts', [$this, 'enqueue_scripts']);
+    add_action('init', [$this, 'register_shortcodes']); // Register shortcodes
   }
 
   // Create the settings page in the WordPress admin
@@ -112,12 +113,12 @@ class PracticeInfoSettings
     $option = get_option($args['label_for'], 'contact_number'); // Default to regular contact number
 ?>
     <select id="<?php echo esc_attr($args['label_for']); ?>" name="<?php echo esc_attr($args['label_for']); ?>">
-      <option value="">Please Select</option>
       <option value="contact_number" <?php selected($option, 'contact_number'); ?>>Regular Contact Number</option>
       <option value="call_tracking_number" <?php selected($option, 'call_tracking_number'); ?>>Call Tracking Number</option>
     </select>
     <p><em>Bricks: {echo:get_final_contact_number}</em></p>
     <p><em>Oxygen: [oxygen data="phpfunction" function="get_final_contact_number"]</em></p>
+    <p><em>Shortcode: [get_final_contact_number]</em></p>
   <?php
   }
 
@@ -126,12 +127,12 @@ class PracticeInfoSettings
     $option = get_option($args['label_for'], 'contact_number_2'); // Default to regular contact number
   ?>
     <select id="<?php echo esc_attr($args['label_for']); ?>" name="<?php echo esc_attr($args['label_for']); ?>">
-      <option value="">Please Select</option>
       <option value="contact_number_2" <?php selected($option, 'contact_number_2'); ?>>Regular Contact Number</option>
       <option value="call_tracking_number_2" <?php selected($option, 'call_tracking_number_2'); ?>>Call Tracking Number</option>
     </select>
     <p><em>Bricks: {echo:get_final_contact_number_2}</em></p>
     <p><em>Oxygen: [oxygen data="phpfunction" function="get_final_contact_number_2"]</em></p>
+    <p><em>Shortcode: [get_final_contact_number_2]</em></p>
   <?php
   }
 
@@ -149,6 +150,7 @@ class PracticeInfoSettings
     ]);
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
     echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
+    echo '<p><em>Shortcode: [' . esc_html($brick_function) . '] </em></p>';
   }
 
   public function render_wysiwyg_field2($args)
@@ -165,6 +167,7 @@ class PracticeInfoSettings
     ]);
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
     echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
+    echo '<p><em>Shortcode: [' . esc_html($brick_function) . '] </em></p>';
   }
 
   public static function get_final_contact_number()
@@ -188,6 +191,7 @@ class PracticeInfoSettings
     echo '<input type="text" id="' . esc_attr($args['label_for']) . '" name="' . esc_attr($args['label_for']) . '" value="' . esc_attr($option) . '" />';
     echo '<p><em>Bricks: {echo:' . esc_html($brick_function) . '}</em></p>';
     echo '<p><em>Oxygen: [oxygen data="phpfunction" function="' . esc_html($brick_function) . '"] </em></p>';
+    echo '<p><em>Shortcode: [' . esc_html($brick_function) . '] </em></p>';
   }
 
   public function render_toggle_field($args)
@@ -214,9 +218,9 @@ class PracticeInfoSettings
         ?>
         <div id="practice-info-settings-2">
           <?php
-          if (get_option('show_second_location', false)) {
-            do_settings_sections('practice-info-settings2');
-          }
+          // if (get_option('show_second_location', false)) {
+          do_settings_sections('practice-info-settings2');
+          // }
           ?>
         </div>
         <?php
@@ -353,6 +357,170 @@ class PracticeInfoSettings
   public static function get_practice_hours_2()
   {
     return get_option('practice_hours_2', '');
+  }
+
+  // Register shortcodes
+  public function register_shortcodes()
+  {
+    add_shortcode('get_practice_name', [$this, 'shortcode_practice_name']);
+    add_shortcode('get_doctor_name', [$this, 'shortcode_doctor_name']);
+    add_shortcode('get_practice_technique', [$this, 'shortcode_practice_technique']);
+    add_shortcode('get_practice_address', [$this, 'shortcode_practice_address']);
+    add_shortcode('get_practice_website', [$this, 'shortcode_practice_website']);
+    add_shortcode('get_practice_email', [$this, 'shortcode_practice_email']);
+    add_shortcode('get_contact_number', [$this, 'shortcode_contact_number']);
+    add_shortcode('get_call_tracking_number', [$this, 'shortcode_call_tracking_number']);
+    add_shortcode('get_cta_label', [$this, 'shortcode_cta_label']);
+    add_shortcode('get_offer_page_link', [$this, 'shortcode_offer_page_link']);
+    add_shortcode('get_google_map_link', [$this, 'shortcode_google_map_link']);
+    add_shortcode('get_practice_hours', [$this, 'shortcode_practice_hours']);
+    add_shortcode('get_final_contact_number', [$this, 'shortcode_final_contact_number']);
+
+    add_shortcode('get_practice_name_2', [$this, 'shortcode_practice_name_2']);
+    add_shortcode('get_doctor_name_2', [$this, 'shortcode_doctor_name_2']);
+    add_shortcode('get_practice_technique_2', [$this, 'shortcode_practice_technique_2']);
+    add_shortcode('get_practice_address_2', [$this, 'shortcode_practice_address_2']);
+    add_shortcode('get_practice_website_2', [$this, 'shortcode_practice_website_2']);
+    add_shortcode('get_practice_email_2', [$this, 'shortcode_practice_email_2']);
+    add_shortcode('get_contact_number_2', [$this, 'shortcode_contact_number_2']);
+    add_shortcode('get_call_tracking_number_2', [$this, 'shortcode_call_tracking_number_2']);
+    add_shortcode('get_cta_label_2', [$this, 'shortcode_cta_label_2']);
+    add_shortcode('get_offer_page_link_2', [$this, 'shortcode_offer_page_link_2']);
+    add_shortcode('get_google_map_link_2', [$this, 'shortcode_google_map_link_2']);
+    add_shortcode('get_practice_hours_2', [$this, 'shortcode_practice_hours_2']);
+    add_shortcode('get_final_contact_number_2', [$this, 'shortcode_final_contact_number_2']);
+  }
+
+  // Shortcode callback functions for the first location
+  public function shortcode_practice_name()
+  {
+    return $this->get_practice_name();
+  }
+
+  public function shortcode_doctor_name()
+  {
+    return $this->get_doctor_name();
+  }
+
+  public function shortcode_practice_technique()
+  {
+    return $this->get_practice_technique();
+  }
+
+  public function shortcode_practice_address()
+  {
+    return $this->get_practice_address();
+  }
+
+  public function shortcode_practice_website()
+  {
+    return $this->get_practice_website();
+  }
+
+  public function shortcode_practice_email()
+  {
+    return $this->get_practice_email();
+  }
+
+  public function shortcode_contact_number()
+  {
+    return $this->get_contact_number();
+  }
+
+  public function shortcode_call_tracking_number()
+  {
+    return $this->get_call_tracking_number();
+  }
+
+  public function shortcode_cta_label()
+  {
+    return $this->get_cta_label();
+  }
+
+  public function shortcode_offer_page_link()
+  {
+    return $this->get_offer_page_link();
+  }
+
+  public function shortcode_google_map_link()
+  {
+    return $this->get_google_map_link();
+  }
+
+  public function shortcode_practice_hours()
+  {
+    return $this->get_practice_hours();
+  }
+
+  public function shortcode_final_contact_number()
+  {
+    return $this->get_final_contact_number();
+  }
+
+  // Shortcode callback functions for the second location
+  public function shortcode_practice_name_2()
+  {
+    return $this->get_practice_name_2();
+  }
+
+  public function shortcode_doctor_name_2()
+  {
+    return $this->get_doctor_name_2();
+  }
+
+  public function shortcode_practice_technique_2()
+  {
+    return $this->get_practice_technique_2();
+  }
+
+  public function shortcode_practice_address_2()
+  {
+    return $this->get_practice_address_2();
+  }
+
+  public function shortcode_practice_website_2()
+  {
+    return $this->get_practice_website_2();
+  }
+
+  public function shortcode_practice_email_2()
+  {
+    return $this->get_practice_email_2();
+  }
+
+  public function shortcode_contact_number_2()
+  {
+    return $this->get_contact_number_2();
+  }
+
+  public function shortcode_call_tracking_number_2()
+  {
+    return $this->get_call_tracking_number_2();
+  }
+
+  public function shortcode_cta_label_2()
+  {
+    return $this->get_cta_label_2();
+  }
+
+  public function shortcode_offer_page_link_2()
+  {
+    return $this->get_offer_page_link_2();
+  }
+
+  public function shortcode_google_map_link_2()
+  {
+    return $this->get_google_map_link_2();
+  }
+
+  public function shortcode_practice_hours_2()
+  {
+    return $this->get_practice_hours_2();
+  }
+
+  public function shortcode_final_contact_number_2()
+  {
+    return $this->get_final_contact_number_2();
   }
 }
 
